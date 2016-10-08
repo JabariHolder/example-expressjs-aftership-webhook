@@ -1,28 +1,18 @@
-var express = require('express'),
-    bodyParser = require('body-parser'),
-    app = express(),
-    port = 3000;
+"use strict";
 
-app.use(bodyParser.json());
+/* Setup */
+var Security = require('./classes/Security');
+var WebHook = require('./classes/WebHook');
+var MessengerBot = require('./classes/MessengerBot');
 
-app.post('/', function (req, res) {
-    var body = req.body;
-    var trackingNumber = body.msg.tracking_number;
-    var slug = body.msg.slug;
-    var token = body.msg.unique_token;
+/* Secure Endpoint */
+var security = new Security();
+security.setup();
 
-    console.log(trackingNumber, slug, token);
-
-    res.json({
-        message: 'ok got it!'
-    });
+/* Start App */
+var hook = new WebHook(security);
+hook.post(function(req, res, headers, body) {
+	hook.ifttt(res);
 });
 
-var server = app.listen(port, function () {
-
-    var host = server.address().address
-    var port = server.address().port
-
-    console.log('Example app listening at http://%s:%s', host, port)
-
-});
+hook.get();
